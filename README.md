@@ -1,4 +1,5 @@
 🛒 Walmart Sales Data Analysis (SQL Project)
+
 📌 Overview
 
 This project focuses on analyzing Walmart sales data using SQL to extract meaningful business insights. The goal is to understand sales performance, customer behavior, and product trends across different branches, cities, and time periods.
