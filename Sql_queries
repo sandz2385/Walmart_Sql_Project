@@ -1,0 +1,160 @@
+select * from walmart;
+
+select count(*) from walmart;
+
+-- total revenue
+
+select round(sum(total),0) as Total_Revenue
+from walmart;
+
+-- avg rating
+
+select round(avg(rating),2) as Average_rating
+from walmart;
+
+-- Average_price
+
+select round(avg(unit_price),2) as Average_Price
+from walmart;
+
+-- profit margin
+
+select round(sum(profit_margin),2) as profit_margin
+from walmart;
+
+
+-- Q1 Find the different payment methods, and how many transactions and items were sold with each method
+
+select payment_method,count(*) as cnt,sum(quantity) as number_qty_sold
+from walmart
+group by payment_method;
+
+-- Q2 Which category received the highest average rating in each branch?
+
+SELECT *
+FROM (
+    SELECT 
+        branch,
+        category,
+        AVG(rating) AS Avg_rating,
+        RANK() OVER (
+            PARTITION BY branch 
+            ORDER BY AVG(rating) DESC
+        ) AS rnk
+    FROM walmart
+    GROUP BY branch, category
+) t;
+
+-- Q3 What is the busiest day of the week for each branch based on transaction volume 
+
+SELECT *
+FROM (
+    SELECT 
+        branch,
+        DATE_FORMAT(date, '%W') AS `Day`,
+        COUNT(*) AS no_transactions,
+        RANK() OVER (
+            PARTITION BY branch 
+            ORDER BY COUNT(*) DESC
+        ) AS rnk
+    FROM walmart
+    GROUP BY branch,`Day`
+) t
+WHERE rnk = 1;
+
+-- Q4 Total_rvenue by city and Total number of transcations
+
+select city,Round(sum(total),0) as Total_Revenue,count(*) as Total_no_transactions
+from walmart
+group by city;
+
+-- Q5 Branch wise comparison
+
+SELECT 
+    branch,
+    SUM(total) AS revenue,
+    AVG(rating) AS rating,
+    SUM(quantity) AS items
+FROM walmart
+GROUP BY branch;
+
+-- Q6 Month-wise Total revenue
+
+select date_format(date,'%M') as `Month`,round(sum(total),0) as Total_Revenue
+from walmart
+group by month(date),`Month`
+order by month(date);
+
+-- Q7 Year-wise Total revenue
+
+select date_format(date,'%Y') as `Year`,round(sum(total),0) as Total_Revenue
+from walmart
+group by date_format(date,'%Y')
+order by `Year` asc;
+
+-- Q8 How many transactions occur in each shift (Morning, Afternoon, Evening) across branches?
+
+with cte as (SELECT *, 
+(Case when hour(time)<12 Then 'Morning'  
+	when hour(time) between 12 and 17 Then 'Afternoon'
+    else 'Evening'
+end) as Shift_time
+from walmart)
+
+select Shift_time,count(*) as Number_of_Customers
+from cte
+group by Shift_time;
+
+
+-- Q9 year-wise total users
+
+select date_format(date,'%Y') as `Year`,count(invoice_id) as Total_Users
+from walmart
+group by date_format(date,'%Y')
+order by `Year` asc;
+
+-- Q10 profit margin analysis by category,branch
+
+select category,round(sum(profit_margin),2) as Total_profit_margin
+from walmart
+group by category;
+
+select branch,round(sum(profit_margin),2) as Total_profit_margin
+from walmart
+group by branch;
+
+-- Q11 total purchased quantity by category
+
+select category,sum(quantity) as Total_quantity
+from walmart
+group by category
+order by Total_quantity asc;
+
+-- Q12 avg rating by an category and payment method
+
+
+select category,round(avg(rating),2) as avg_rating
+from walmart
+group by category
+order by avg_rating asc;
+
+
+select payment_method,round(avg(rating),2) as avg_rating 
+from walmart
+group by payment_method
+order by avg_rating asc;
+
+
+-- Q13 avg price of an product category
+
+select category,round(avg(unit_price),1) as avg_price
+from walmart
+group by category
+
+
+
+
+
+
+
+
